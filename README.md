@@ -71,7 +71,7 @@ This handles all API requests whose URL begins with `/bills/`
 
 #### DStv
 
-##### Validate Dstv User
+##### Validate DStv User
 
 `GET /bills/user_check`: Validate a DStv user
 
@@ -85,9 +85,9 @@ if err != nil {
 log.Println(user.Details.LastName) // e.g INI OBONG BASSEY
 ```
 
-##### Pay a dstv subscription
+##### Pay a DStv subscription
 
-`GET /bills/dstv` - Pay a dstv subscription
+`GET /bills/dstv` - Pay a DStv subscription
 
 ```go
 user, _, err := mobilenigClient.Bills.PayDStv(context.Background(), "4131953321")
@@ -99,9 +99,9 @@ if err != nil {
 log.Println(user.Details.LastName) // e.g INI OBONG BASSEY
 ```
 
-##### Fetch a dstv transaction
+##### Fetch a DStv transaction
 
-`GET /bills/query` - Fetch a dstv transaction
+`GET /bills/query` - Fetch a DStv transaction
 
 ```go
 user, _, err := mobilenigClient.Bills.PayDStv(context.Background(), "4131953321")
