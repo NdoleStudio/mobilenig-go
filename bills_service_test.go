@@ -2,6 +2,7 @@ package mobilenig
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"testing"
@@ -106,6 +107,29 @@ func TestBillsService_CheckDStvUser(t *testing.T) {
 				assert.Equal(t, "Invalid username or api_key", resp.Error.Description)
 
 				// Teardown
+				server.Close()
+			})
+		}
+	})
+
+	t.Run("it returns an error when the context is cancelled", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, stubs.CheckDstvUserResponse())
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+
+				// Act
+				_, _, err := client.Bills.CheckDStvUser(ctx, "")
+
+				// Assert
+				assert.True(t, errors.Is(err, context.Canceled))
 				server.Close()
 			})
 		}
@@ -219,6 +243,29 @@ func TestBillsService_PayDStv(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("it returns an error when the context is cancelled", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, stubs.CheckDstvUserResponse())
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+
+				// Act
+				_, _, err := client.Bills.PayDStv(ctx, &PayDstvOptions{})
+
+				// Assert
+				assert.True(t, errors.Is(err, context.Canceled))
+				server.Close()
+			})
+		}
+	})
 }
 
 //nolint:funlen
@@ -303,6 +350,29 @@ func TestBillsService_QueryDStv(t *testing.T) {
 				assert.Equal(t, "ERR101", resp.Error.Code)
 				assert.Equal(t, "Invalid username or api_key", resp.Error.Description)
 
+				server.Close()
+			})
+		}
+	})
+
+	t.Run("it returns an error when the context is cancelled", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, stubs.CheckDstvUserResponse())
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+
+				// Act
+				_, _, err := client.Bills.QueryDStv(ctx, "122790223")
+
+				// Assert
+				assert.True(t, errors.Is(err, context.Canceled))
 				server.Close()
 			})
 		}
