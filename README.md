@@ -90,13 +90,16 @@ log.Println(user.Details.LastName) // e.g INI OBONG BASSEY
 `GET /bills/dstv` - Pay a DStv subscription
 
 ```go
-user, _, err := mobilenigClient.Bills.PayDStv(context.Background(), "4131953321")
+transaction, _, _ = client.Bills.PayDStv(context.Background(), &PayDstvOptions{
+    TransactionID:   "122790223",
+    Price:           "790",
+    ProductCode:     "PRWE36",
+    CustomerName:    "ESU INI OBONG BASSEY",
+    CustomerNumber:  "275953782",
+    SmartcardNumber: "4131953321",
+})
 
-if err != nil {
-    log.Fatal(err)
-}
-
-log.Println(user.Details.LastName) // e.g INI OBONG BASSEY
+log.Println(transaction.TransactionID) // e.g 122790223
 ```
 
 ##### Fetch a DStv transaction
@@ -104,13 +107,12 @@ log.Println(user.Details.LastName) // e.g INI OBONG BASSEY
 `GET /bills/query` - Fetch a DStv transaction
 
 ```go
-user, _, err := mobilenigClient.Bills.PayDStv(context.Background(), "4131953321")
-
+transaction, _, err := client.Bills.QueryDStv(context.Background(), "122790223")
 if err != nil {
     log.Fatal(err)
 }
 
-log.Println(user.Details.LastName) // e.g INI OBONG BASSEY
+log.Println(transaction.TransactionID) // e.g 122790223
 ```
 
 ## Testing
