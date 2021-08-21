@@ -91,7 +91,7 @@ func TestWithAPIKey(t *testing.T) {
 }
 
 func TestWithBaseURL(t *testing.T) {
-	t.Run("it sets the baseURL successfully", func(t *testing.T) {
+	t.Run("it sets the apiBaseURL successfully", func(t *testing.T) {
 		// Arrange
 		config := defaultClientConfig()
 		endpoint, _ := url.Parse("https://example.com")
@@ -103,7 +103,7 @@ func TestWithBaseURL(t *testing.T) {
 		assert.Equal(t, endpoint.String(), config.baseURL)
 	})
 
-	t.Run("it does not set the baseURL when it is nil", func(t *testing.T) {
+	t.Run("it does not set the apiBaseURL when it is nil", func(t *testing.T) {
 		// Arrange
 		config := defaultClientConfig()
 
@@ -111,6 +111,6 @@ func TestWithBaseURL(t *testing.T) {
 		WithBaseURL(nil).apply(config)
 
 		// Assert
-		assert.Equal(t, baseURL, config.baseURL)
+		assert.Equal(t, apiBaseURL, config.baseURL)
 	})
 }

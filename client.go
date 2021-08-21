@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	baseURL = "https://mobilenig.com/API"
+	apiBaseURL = "https://mobilenig.com/API"
 )
 
 type service struct {
@@ -25,6 +25,7 @@ type Client struct {
 	environment Environment
 	username    string
 	apiKey      string
+	baseURL     string
 	Bills       *BillsService
 }
 
@@ -40,6 +41,7 @@ func New(options ...ClientOption) *Client {
 		httpClient:  config.httpClient,
 		environment: config.environment,
 		username:    config.username,
+		baseURL:     config.baseURL,
 		apiKey:      config.apiKey,
 	}
 
@@ -49,10 +51,10 @@ func New(options ...ClientOption) *Client {
 }
 
 // newRequest creates an API request. A relative URL can be provided in uri,
-// in which case it is resolved relative to the baseURL of the Client.
+// in which case it is resolved relative to the apiBaseURL of the Client.
 // URI's should always be specified without a preceding slash.
 func (client *Client) newRequest(ctx context.Context, uri string, params map[string]string) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseURL+uri, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, client.baseURL+uri, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -112,8 +114,10 @@ func (client *Client) newResponse(httpResponse *http.Response) (*Response, error
 	}
 	resp.Body = &buf
 
-	if resp.Err() != nil {
-		_ = json.Unmarshal(*resp.Body, resp.Error)
+	errResponse := new(ErrorResponse)
+	err = json.Unmarshal(*resp.Body, errResponse)
+	if err == nil {
+		resp.Error = errResponse
 	}
 
 	return resp, resp.Err()

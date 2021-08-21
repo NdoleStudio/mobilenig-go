@@ -17,7 +17,7 @@ func defaultClientConfig() *clientConfig {
 		httpClient:  http.DefaultClient,
 		apiKey:      "",
 		username:    "",
-		baseURL:     baseURL,
+		baseURL:     apiBaseURL,
 		environment: LiveEnvironment,
 	}
 }

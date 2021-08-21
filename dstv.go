@@ -47,7 +47,7 @@ type DStvUser struct {
 		CustomerType   string    `json:"customerType"`
 		InvoicePeriod  int       `json:"invoicePeriod"`
 		DueDate        time.Time `json:"dueDate"`
-		CustomerNumber int       `json:"customerNumber"`
+		CustomerNumber int64     `json:"customerNumber"`
 	} `json:"details"`
 }
 

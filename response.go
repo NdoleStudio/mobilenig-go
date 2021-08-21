@@ -22,12 +22,10 @@ type Response struct {
 
 // Err returns an error if the http request is not successfull
 func (r *Response) Err() error {
-	switch r.HTTPResponse.StatusCode {
-	case 200, 201, 202, 204, 205:
-		return nil
-	default:
+	if r.Error != nil && len(r.Error.Description) > 0 {
 		return errors.New(r.errorMessage())
 	}
+	return nil
 }
 
 func (r *Response) errorMessage() string {
