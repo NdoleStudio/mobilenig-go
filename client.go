@@ -3,7 +3,6 @@ package mobilenig
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -97,10 +96,6 @@ func (client *Client) do(req *http.Request) (*Response, error) {
 
 // newResponse converts an *http.Response to *Response
 func (client *Client) newResponse(httpResponse *http.Response) (*Response, error) {
-	if httpResponse == nil {
-		return nil, fmt.Errorf("%T cannot be nil", httpResponse)
-	}
-
 	resp := new(Response)
 	resp.HTTPResponse = httpResponse
 

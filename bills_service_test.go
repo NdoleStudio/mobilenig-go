@@ -13,6 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testUsername = "test_username"
+	testAPIKey   = "test_api_key"
+)
+
 //nolint:funlen
 func TestBillsService_CheckDStvUser(t *testing.T) {
 	t.Parallel()
@@ -59,8 +64,8 @@ func TestBillsService_CheckDStvUser(t *testing.T) {
 				server := helpers.MakeRequestCapturingTestServer(http.StatusOK, stubs.CheckDstvUserResponse(), request)
 
 				baseURL, _ := url.Parse(server.URL)
-				username := "test_username"
-				apiKey := "test_api_key"
+				username := testUsername
+				apiKey := testAPIKey
 				smartcardNumber := "4131953321"
 
 				client := New(WithBaseURL(baseURL), WithAPIKey(apiKey), WithUsername(username), WithEnvironment(environment))
@@ -118,6 +123,8 @@ func TestBillsService_CheckDStvUser(t *testing.T) {
 		environments := []Environment{LiveEnvironment, TestEnvironment}
 		for _, environment := range environments {
 			t.Run(environment.String(), func(t *testing.T) {
+				t.Parallel()
+
 				// Arrange
 				server := helpers.MakeTestServer(http.StatusOK, stubs.CheckDstvUserResponse())
 				baseURL, _ := url.Parse(server.URL)
@@ -130,6 +137,31 @@ func TestBillsService_CheckDStvUser(t *testing.T) {
 
 				// Assert
 				assert.True(t, errors.Is(err, context.Canceled))
+				server.Close()
+			})
+		}
+	})
+
+	t.Run("it returns an error when the response cannot be decoded", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				t.Parallel()
+
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, "<not-a-json></not-a-json>")
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+
+				// Act
+				_, _, err := client.Bills.CheckDStvUser(context.Background(), "")
+
+				// Assert
+				assert.Error(t, err)
+
+				// Teardown
 				server.Close()
 			})
 		}
@@ -176,8 +208,8 @@ func TestBillsService_PayDStv(t *testing.T) {
 				server := helpers.MakeRequestCapturingTestServer(http.StatusOK, stubs.CheckDstvUserResponse(), request)
 
 				baseURL, _ := url.Parse(server.URL)
-				username := "test_username"
-				apiKey := "test_api_key"
+				username := testUsername
+				apiKey := testAPIKey
 				smartcardNumber := "4131953321"
 				customerNumber := "275953782"
 				customerName := "ESU INI OBONG BASSEY"
@@ -262,6 +294,58 @@ func TestBillsService_PayDStv(t *testing.T) {
 
 				// Assert
 				assert.True(t, errors.Is(err, context.Canceled))
+
+				// Teardown
+				server.Close()
+			})
+		}
+	})
+
+	t.Run("it returns an error if the options is nil", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, stubs.CheckDstvUserResponse())
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+
+				// Act
+				_, _, err := client.Bills.PayDStv(ctx, nil)
+
+				// Assert
+				assert.Error(t, err)
+
+				// Teardown
+				server.Close()
+			})
+		}
+	})
+
+	t.Run("it returns an error when the response cannot be decoded", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				t.Parallel()
+
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, "<not-a-json></not-a-json>")
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+
+				// Act
+				_, _, err := client.Bills.PayDStv(context.Background(), &PayDstvOptions{})
+
+				// Assert
+				assert.Error(t, err)
+
+				// Teardown
 				server.Close()
 			})
 		}
@@ -308,8 +392,8 @@ func TestBillsService_QueryDStv(t *testing.T) {
 				server := helpers.MakeRequestCapturingTestServer(http.StatusOK, stubs.CheckDstvUserResponse(), request)
 
 				baseURL, _ := url.Parse(server.URL)
-				username := "test_username"
-				apiKey := "test_api_key"
+				username := testUsername
+				apiKey := testAPIKey
 				transactionID := "122790223"
 
 				client := New(WithBaseURL(baseURL), WithAPIKey(apiKey), WithUsername(username), WithEnvironment(environment))
@@ -361,6 +445,8 @@ func TestBillsService_QueryDStv(t *testing.T) {
 		environments := []Environment{LiveEnvironment, TestEnvironment}
 		for _, environment := range environments {
 			t.Run(environment.String(), func(t *testing.T) {
+				t.Parallel()
+
 				// Arrange
 				server := helpers.MakeTestServer(http.StatusOK, stubs.CheckDstvUserResponse())
 				baseURL, _ := url.Parse(server.URL)
@@ -373,6 +459,33 @@ func TestBillsService_QueryDStv(t *testing.T) {
 
 				// Assert
 				assert.True(t, errors.Is(err, context.Canceled))
+
+				// Teardown
+				server.Close()
+			})
+		}
+	})
+
+	t.Run("it returns an error when the response cannot be decoded", func(t *testing.T) {
+		t.Parallel()
+
+		environments := []Environment{LiveEnvironment, TestEnvironment}
+		for _, environment := range environments {
+			t.Run(environment.String(), func(t *testing.T) {
+				t.Parallel()
+
+				// Arrange
+				server := helpers.MakeTestServer(http.StatusOK, "<not-a-json></not-a-json>")
+				baseURL, _ := url.Parse(server.URL)
+				client := New(WithBaseURL(baseURL), WithEnvironment(environment))
+
+				// Act
+				_, _, err := client.Bills.QueryDStv(context.Background(), "122790223")
+
+				// Assert
+				assert.Error(t, err)
+
+				// Teardown
 				server.Close()
 			})
 		}
