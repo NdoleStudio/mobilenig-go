@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strconv"
 	"testing"
 	"time"
 
@@ -477,4 +478,55 @@ func TestBillsService_QueryDStv_InvalidResponse(t *testing.T) {
 			server.Close()
 		})
 	}
+}
+
+func TestBillsService_GetDStvPackageResponse(t *testing.T) {
+	// Setup
+	t.Parallel()
+
+	// Arrange
+	server := helpers.MakeTestServer(http.StatusOK, stubs.DstvPackageResponse())
+	baseURL, _ := url.Parse(server.URL)
+	client := New(WithBaseURL(baseURL))
+	expected := "DStv French Touch Add-on Bouquet E36 + DStv Yanga Bouquet E36"
+
+	// Act
+	dstvPackage, _, err := client.Bills.GetDStvPackage(context.Background(), 122790223)
+
+	// Assert
+	assert.NoError(t, err)
+
+	assert.Equal(t, &expected, dstvPackage)
+
+	// Teardown
+	server.Close()
+}
+
+func TestBillsService_GetDStvPackageRequest(t *testing.T) {
+	// Setup
+	t.Parallel()
+
+	// Arrange
+	request := new(http.Request)
+	server := helpers.MakeRequestCapturingTestServer(http.StatusOK, stubs.DstvPackageResponse(), request)
+
+	baseURL, _ := url.Parse(server.URL)
+	username := testUsername
+	apiKey := testAPIKey
+	transactionID := int64(122790223)
+
+	client := New(WithBaseURL(baseURL), WithAPIKey(apiKey), WithUsername(username))
+
+	// Act
+	_, _, _ = client.Bills.GetDStvPackage(context.Background(), transactionID)
+
+	// Assert
+	assert.Equal(t, "/bills/get_package", request.URL.Path)
+	assert.Equal(t, username, request.URL.Query().Get("username"))
+	assert.Equal(t, apiKey, request.URL.Query().Get("api_key"))
+	assert.Equal(t, "DSTV", request.URL.Query().Get("service"))
+	assert.Equal(t, strconv.FormatInt(transactionID, 10), request.URL.Query().Get("customerNumber"))
+
+	// Teardown
+	server.Close()
 }

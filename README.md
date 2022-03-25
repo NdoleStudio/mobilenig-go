@@ -29,8 +29,9 @@ import "github.com/NdoleStudio/mobilenig-go"
 - [Bills](#bills)
   - DStv
     - `GET /bills/user_check` - Validate a DStv user
-    - `GET /bills/dstv` - Pay a dstv subscription
-    - `GET /bills/query` - Fetch a dstv transaction
+    - `GET /bills/dstv` - Pay a DStv subscription
+    - `GET /bills/query` - Fetch a DStv transaction
+    - `GET /bills/get_package` - Fetch current DStv package
 
 ## Usage
 
@@ -114,6 +115,20 @@ if err != nil {
 
 log.Println(transaction.TransactionID) // e.g 122790223
 ```
+
+##### Get current DStv package
+
+`GET /bills/get_package` - Returns the client's current DStv package
+
+```go
+dstvPackage, _, err := client.Bills.GetDStvPackage(context.Background(), "122790223")
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Println(dstvPackage) // e.g DStv French Touch
+```
+
 
 ## Testing
 

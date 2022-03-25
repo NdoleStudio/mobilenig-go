@@ -17,7 +17,7 @@ func CheckDstvUserResponse() string {
 `
 }
 
-// PayDstvBillResponse is a dummy JSON response for paying a DSTV bill
+// PayDstvBillResponse is a dummy JSON response for paying a DStv bill
 func PayDstvBillResponse() string {
 	return `
 	{
@@ -46,6 +46,14 @@ func QueryDstvTransactionResponse() string {
 			"status":"SUCCESSFUL",
 			"balance":"7931"
 		}
+	}`
+}
+
+// DstvPackageResponse is a dummy JSON response querying the dstv package
+func DstvPackageResponse() string {
+	return `
+	{
+		"packageName":"DStv French Touch Add-on Bouquet E36 + DStv Yanga Bouquet E36"
 	}`
 }
 

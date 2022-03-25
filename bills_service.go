@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strconv"
 )
 
 // BillsService is the API client for the `/bills/` endpoint
@@ -38,6 +39,33 @@ func (service *BillsService) CheckDStvUser(ctx context.Context, smartcardNumber 
 	}
 
 	return &dstvUser, resp, nil
+}
+
+// GetDStvPackage returns the client's current DStv package.
+// POST /bills/get_package
+// API Doc: https://mobilenig.com/API/docs/dstv
+func (service *BillsService) GetDStvPackage(ctx context.Context, customerNumber int64) (*string, *Response, error) {
+	payload := map[string]string{
+		"service":        billsServiceDStv,
+		"customerNumber": strconv.FormatInt(customerNumber, 10),
+	}
+
+	request, err := service.client.newRequest(ctx, "/bills/get_package", payload)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := service.client.do(request)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	details := map[string]*string{}
+	if err = json.Unmarshal(*resp.Body, &details); err != nil {
+		return nil, resp, err
+	}
+
+	return details["packageName"], resp, nil
 }
 
 // PayDStv pays a DStv subscription
